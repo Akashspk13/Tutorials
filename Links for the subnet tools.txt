@@ -1,0 +1,9 @@
+IP Subnet Calculator: https://www.ipaddressguide.com/subnetcalculator
+
+SolarWinds Advanced Subnet Calculator: https://www.solarwinds.com/free-tools/advanced-subnet-calculator
+
+VLSM Subnet Calculator: https://www.calculator.net/ip-subnet-calculator.html
+
+Subnetting Practice: https://www.subnetting.net/Subnetting-Practice
+
+PacketLife.net Subnet Calculator: https://subnetting.net/calculator/ip/subnet-calculator

@@ -1,0 +1,25 @@
+                                      
+input {
+  file {
+    path => "/var/log/nginx/access.log"
+    start_position => "beginning"
+  }
+}
+
+filter {
+  grok {
+    match => { "message" => "%{COMBINEDAPACHELOG}" }
+  }
+}
+
+output {
+  mongodb {
+    uri => "mongodb://localhost/transitapp"
+    database => "transitapp"
+    collection => "transitapp_logs"
+    codec => "json"
+  }
+}
+
+
+

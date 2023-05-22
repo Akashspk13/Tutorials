@@ -1,0 +1,59 @@
+Step 1. Configure Dynamic VPN Users and IP Address Pool
+delete access profile Dynamic-XAuth client Akash firewall-user password $Hruthi!6*
+delete access profile Dynamic-XAuth address-assignment pool Dynamic-VPN-Pool
+delete access address-assignment pool Dynamic-VPN-Pool family inet network 192.168.10.0/24
+delete access address-assignment pool Dynamic-VPN-Pool family inet xauth-attributes primary-dns 8.8.8.8/32
+delete access firewall-authentication web-authentication default-profile Dynamic-XAuth
+
+Step 2. Configure IPSec Phase 1
+delete security ike proposal Dynamic-VPN-P1-Proposal description “Dynamic P1 Proposal”
+delete security ike proposal Dynamic-VPN-P1-Proposal authentication-method pre-shared-keys
+delete security ike proposal Dynamic-VPN-P1-Proposal dh-group group2
+delete security ike proposal Dynamic-VPN-P1-Proposal authentication-algorithm sha1
+delete security ike proposal Dynamic-VPN-P1-Proposal encryption-algorithm 3des-cbc
+delete security ike proposal Dynamic-VPN-P1-Proposal lifetime-seconds 1200
+delete security ike policy Dynamic-VPN-P2-Policy mode aggressive
+delete security ike policy Dynamic-VPN-P2-Policy description “Dynamic P2 Policy”
+delete security ike policy Dynamic-VPN-P2-Policy proposals Dynamic-VPN-P1-Proposal
+delete security ike policy Dynamic-VPN-P2-Policy pre-shared-key ascii-text Tran5L@yer$240
+delete security ike gateway Dynamic-VPN-P1-Gateway ike-policy Dynamic-VPN-P2-Policy
+delete security ike gateway Dynamic-VPN-P1-Gateway dynamic hostname bmtc.com
+delete security ike gateway Dynamic-VPN-P1-Gateway dynamic ike-user-type shared-ike-id
+delete security ike gateway Dynamic-VPN-P1-Gateway external-interface reth02.0
+delete security ike gateway Dynamic-VPN-P1-Gateway xauth access-profile Dynamic-XAuth
+
+Step 3. Configure IPSec Phase 2
+delete security ipsec proposal Dynamic-P2-Proposal description Dynamic-VPN-P2-Proposal
+delete security ipsec proposal Dynamic-P2-Proposal protocol esp
+delete security ipsec proposal Dynamic-P2-Proposal authentication-algorithm hmac-sha1-96
+delete security ipsec proposal Dynamic-P2-Proposal encryption-algorithm aes-256-cbc
+delete security ipsec proposal Dynamic-P2-Proposal lifetime-seconds 3600
+delete security ipsec policy Dynamic-P2-Policy perfect-forward-secrecy keys group5
+delete security ipsec policy Dynamic-P2-Policy proposals Dynamic-P2-Proposal
+delete security ipsec vpn Dynamic-VPN ike gateway Dynamic-VPN-P1-Gateway
+delete security ipsec vpn Dynamic-VPN ike ipsec-policy Dynamic-P2-Policy
+delete security ipsec vpn Dynamic-VPN establish-tunnels immediately
+
+Step 4. Configure Dynamic VPN Parameters
+delete security dynamic-vpn force-upgrade
+delete security dynamic-vpn access-profile Dynamic-XAuth
+delete security dynamic-vpn clients all remote-protected-resources 10.30.2.0/24
+delete security dynamic-vpn clients all remote-exceptions 0.0.0.0/0
+delete security dynamic-vpn clients all ipsec-vpn Dynamic-VPN
+delete security dynamic-vpn clients all user Akash
+
+
+Step 5. Configure Security Policy
+delete security policies from-zone INTERNET to-zone MPLS policy Dynamic-VPN match source-address any
+delete security policies from-zone INTERNET to-zone MPLS trust policy Dynamic-VPN match destination-address any
+delete security policies from-zone INTERNET to-zone MPLS trust policy Dynamic-VPN match application any
+delete security policies from-zone INTERNET to-zone MPLS trust policy Dynamic-VPN then permit tunnel ipsec-vpn Dynamic-VPN
+
+Step 6. Verifying IPSec Connection
+root@SRX240> show security dynamic-vpn users
+root@SRX240> show security dynamic-vpn client version
+root@SRX240> show security ike active-peer
+root@SRX240> show security ike security-associations
+root@SRX240> show security ipsec security-associations
+
+You can download and install JunOS Pulse client application on user PCs. JunOS Pulse is a VPN client from Juniper. Users out on the internet can use this tool to connect to VPN. To use this tool, click Add (+) button. Uner type, choose SRX. Then type name of the connection. Type IP address or domain name of the SRX device. And then, click Add button.
